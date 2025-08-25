@@ -1,0 +1,246 @@
+local rep = 'https://raw.githubusercontent.com/deividcomsono/Obsidian/main/'
+local lib = loadstring(game:HttpGet(rep .. 'Library.lua'))()
+local tm = loadstring(game:HttpGet(rep .. 'addons/ThemeManager.lua'))()
+local sm = loadstring(game:HttpGet(rep .. 'addons/SaveManager.lua'))()
+
+local opts = lib.Options
+local togs = lib.Toggles
+
+lib.ForceCheckbox = false
+lib.ShowToggleFrameInKeybinds = true
+
+local win = lib:CreateWindow({
+    Title = 'Fale',
+    Footer = 'Fale is free',
+    Icon = 'rbxassetid://92172247325677',
+    NotifySide = 'Right',
+    ShowCustomCursor = true,
+})
+
+local tabs = {
+    Main = win:AddTab('Main', 'user'),
+    ['UI Settings'] = win:AddTab('UI Settings', 'settings'),
+}
+
+local move = tabs.Main:AddLeftGroupbox('Move', 'running')
+
+move:AddToggle('CFrameSpeed', {
+    Text = 'cframe speed',
+    Default = false,
+    Callback = function(value)
+        lib.cframespeed = value
+    end,
+})
+
+move:AddSlider('Speed', {
+    Text = 'speed',
+    Default = 3,
+    Min = 0.01,
+    Max = 5,
+    Rounding = 2,
+    Compact = false,
+    Callback = function(value)
+        lib.speed = value
+    end,
+})
+
+local spinbot = tabs.Main:AddLeftGroupbox('Spinbot', 'refresh-cw')
+
+spinbot:AddToggle('Spinbot', {
+    Text = 'spinbot',
+    Default = false,
+    Callback = function(value)
+        lib.spinbot = value
+    end,
+})
+
+spinbot:AddSlider('SpinSpeed', {
+    Text = 'spin speed',
+    Default = 5,
+    Min = 1,
+    Max = 20,
+    Rounding = 0,
+    Compact = false,
+    Callback = function(value)
+        lib.sped = value
+    end,
+})
+
+local main = tabs.Main:AddRightGroupbox('Shoot', 'boxes')
+
+main:AddToggle('AutoRelease', {
+    Text = 'auto release',
+    Default = false,
+    Callback = function(value)
+        lib.autorelease = value
+    end,
+})
+
+main:AddSlider('ReleaseDelay', {
+    Text = 'delay',
+    Default = 0.5,
+    Min = 0.1,
+    Max = 0.6,
+    Rounding = 2,
+    Compact = false,
+    Callback = function(value)
+        lib.vvuh = value
+    end,
+})
+
+local anti = tabs.Main:AddRightGroupbox('Anti', 'shield')
+
+anti:AddToggle('AntiContest', {
+    Text = 'Anti Contest',
+    Default = false,
+    Callback = function(value)
+        lib.anticontest = value
+        if not value and lib.mmbbbboh then
+            hum.HipHeight = lib.mmbbbboh
+        end
+    end,
+})
+
+anti:AddSlider('Height', {
+    Text = 'height',
+    Default = 15.1,
+    Min = 0,
+    Max = 25,
+    Rounding = 1,
+    Compact = false,
+    Callback = function(value)
+        lib.Height = value
+    end,
+})
+
+local plr = game.Players.LocalPlayer
+local char = plr.Character or plr.CharacterAdded:Wait()
+local hum = char:WaitForChild('Humanoid')
+local hrp = char:WaitForChild('HumanoidRootPart')
+
+lib.cframespeed = false
+lib.speed = 3
+lib.autorelease = false
+lib.vvuh = 0.5
+lib.anticontest = false
+lib.Height = 15.1
+lib.mmbbbboh = hum.HipHeight
+lib.spinbot = false
+lib.sped = 5
+lib.ttvvdrizy = 0
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Action = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Server"):WaitForChild("Action")
+
+local mm
+mm = hookmetamethod(game, "__namecall", function(self, ...)
+    local method, cc, id = getnamecallmethod(), checkcaller(), {...}
+    
+    if method == "FireServer" and self == Action then
+        local vv = id[1]
+        local bb = id[2] or {}
+        
+        if vv == "Shoot" then
+            if bb.Shoot == true then
+                if lib.autorelease then
+                    task.spawn(function()
+                        task.wait(lib.vvuh)
+                        Action:FireServer("Shoot", {Shoot = false})
+                    end)
+                end
+                if lib.anticontest then
+                    hum.HipHeight = lib.Height
+                end
+            else
+                if lib.anticontest and lib.mmbbbboh then
+                    hum.HipHeight = lib.mmbbbboh
+                end
+            end
+        end
+    end
+    
+    return mm(self, ...)
+end)
+
+game:GetService('RunService').Heartbeat:Connect(function()
+    if lib.cframespeed and hum.MoveDirection.Magnitude > 0 then
+        hrp.CFrame = hrp.CFrame + hum.MoveDirection * lib.speed
+    end
+
+    if lib.spinbot and hrp then
+        if not hrp:FindFirstChild("Spin") then
+            local spin = Instance.new("BodyAngularVelocity")
+            spin.Name = "Spin"
+            spin.MaxTorque = Vector3.new(0, math.huge, 0)
+            spin.AngularVelocity = Vector3.new(0, lib.sped, 0)
+            spin.Parent = hrp
+        else
+            hrp.Spin.AngularVelocity = Vector3.new(0, lib.sped, 0)
+        end
+    elseif hrp:FindFirstChild("Spin") then
+        hrp.Spin:Destroy()
+    end
+end)
+
+plr.CharacterAdded:Connect(function(idkk)
+    char = idkk
+    hum = idkk:WaitForChild('Humanoid')
+    hrp = idkk:WaitForChild('HumanoidRootPart')
+    lib.mmbbbboh = hum.HipHeight
+    lib.ttvvdrizy = 0
+end)
+
+local menu = tabs['UI Settings']:AddLeftGroupbox('Menu', 'wrench')
+
+menu:AddToggle('KeybindMenuOpen', {
+    Default = lib.KeybindFrame.Visible,
+    Text = 'Open Keybind Menu',
+    Callback = function(value)
+        lib.KeybindFrame.Visible = value
+    end,
+})
+
+menu:AddToggle('ShowCustomCursor', {
+    Text = 'Custom Cursor',
+    Default = true,
+    Callback = function(value)
+        lib.ShowCustomCursor = value
+    end,
+})
+
+menu:AddDropdown('NotificationSide', {
+    Values = { 'Left', 'Right' },
+    Default = 'Right',
+    Text = 'Notification Side',
+    Callback = function(value)
+        lib:SetNotifySide(value)
+    end,
+})
+
+menu:AddDivider()
+menu:AddLabel('Menu bind')
+    :AddKeyPicker('MenuKeybind', {
+        Default = 'RightShift',
+        NoUI = true,
+        Text = 'Menu keybind'
+    })
+
+menu:AddButton('Unload', function()
+    lib:Unload()
+end)
+
+lib.ToggleKeybind = opts.MenuKeybind
+
+tm:SetLibrary(lib)
+sm:SetLibrary(lib)
+
+sm:IgnoreThemeSettings()
+sm:SetIgnoreIndexes({ 'MenuKeybind' })
+
+tm:SetFolder('ffale')
+sm:SetFolder('fale/idknam')
+
+sm:BuildConfigSection(tabs['UI Settings'])
+tm:ApplyToTab(tabs['UI Settings'])
+
+sm:LoadAutoloadConfig()
